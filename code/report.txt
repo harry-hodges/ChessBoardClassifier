@@ -1,0 +1,35 @@
+# Chessboard Diagram Assignment Report
+
+[Replace the square-bracketed text with your own text. *Leave everything else unchanged.* 
+Note, the reports are parsed to check word limits, etc. Changing the format may cause 
+the parsing to fail.]
+
+## Feature Extraction (Max 200 Words)
+
+As the initial images had already been converted into chars, I began the process by calculating the first 40 principal component axes of the data, by creating a covariance matrix, and finding the eigenvectors. This removed a large amount of irrelevant noise from the images, which greatly improved its performance. I then centered the pca data around the mean, and used a for loop to iterate through all the possible states that a square could be (‘k’, ‘Q’ etc). For each of these states, I found the indexes in the 'train_labels’ array that matched them, and used these indexes to select the corresponding 40 values from the pca data. I then implemented a nested for loop, and calculated the divergence of these pca’s, with the pca’s of every other square state, adding each one up. This resulted in a divergence matrix that has accounted for every combination of possible square states. So from this, I sorted the data in descending order and took the first 10, which are the 10 features that are most different, and therefore offer the most information.
+
+## Square Classifier (Max 200 Words)
+
+Firstly, I needed to calculate the cosine distances, and to do that I needed the dot (inner) product of the train and test arrays (which store the feature vectors) as well as the outer product of their lengths, which I calculated using pythagoras’ theorem. Once I had these, I used them to create a 2d array of cosine distances. I then extracted the indexes of the 4 largest values in every row, flattened them into a list and found the corresponding labels in the train_labels array. I chose to set k = 4 as this produced the best overall results on the test data. Next, I needed to find the most common label for each row. I converted all the labels to ASCII, reconstructed the array back into a (1600,4) and went through every row using the bincount function, which, when used with argmax, returns the most common value. I converted the labels to ASCII values because the NumPy function requires numeric values. Finally, I reverted all the ASCII values back into labels and returned them.
+
+## Full-board Classification (Max 200 Words)
+
+My initial approach to this problem involved removing features 9 and 10, and replacing them with the x and y coordinates of the square on the board. In doing so, I hoped the classifier would be able to recognise patterns over the large set of data, and therefore improve its accuracy. This turned out to not be the case, as evidenced by the lower accuracy scores I obtained on both the clean and noisy data when compared to the square classifier. In response to this, I changed my solution, to only have 1 feature for the location, which ranges from 1-64. This allowed me to reintroduce the 9th feature, which resulted in a slight improvement over my previous approach but still produced less accurate results than the square classifier.
+
+## Performance
+
+My percentage correctness scores (to 1 decimal place) for the development data are as follows.
+
+High quality data:
+
+- Percentage Squares Correct: 95.1%
+- Percentage Boards Correct: 91.9%
+
+Noisy data:
+
+- Percentage Squares Correct: 92.1%
+- Percentage Boards Correct: 87.9%
+
+## Other information (Optional, Max 100 words)
+
+N/A
